@@ -6,7 +6,7 @@ const { requireLogin } = require("../middleware/requireLogin")
 
 const Post = mongoose.model('Post', postSchema);
 
-export class PostRoutes { 
+export class PostRoutes {
 
     //  userSchema: UserSchema = new UserSchema();
 
@@ -17,7 +17,7 @@ export class PostRoutes {
         
         // create post
         app.route('/createdpost')
-            .get(requireLogin, function (req: Request, res: Response) {
+            .post(requireLogin, function (req: Request, res: Response) {
                 const { title, body } = req.body
                 if (!title || !body) {
                     return res.status(422).json({ error: "please add required fields" })
@@ -27,15 +27,40 @@ export class PostRoutes {
                     title,
                     body,
                     postedBy: (<any>req).user
-               })
+                })
                 post.save().then(result => {
-                    res.json({post:result})
+                    res.json({ post: result })
                 }).catch((err: any) => {
                     console.log(err)
                 })
             
             })
-    }
+
+        //view all post
+        app.route('/allpost')
+            .get((req: Request, res: Response) => {
+                Post.find().populate("postedBy", "_id name")
+                    .then(posts => {
+                        res.json({ posts })
+                    }).catch(err => {
+                        console.log(err)
+                    })
+            })
+    
         
         
+        
+        app.route('/mypost')
+            .get(requireLogin, function (req: Request, res: Response) {
+                Post.find({ postedBy: (<any>req).user._id })
+                    .populate("postedBy", "_id name").then(mypost => {
+                        res.json({ mypost })
+                    }).catch((err: any) => {
+                        console.log(err)
+                    })
+                    
+            })
+
     }
+}
+      
