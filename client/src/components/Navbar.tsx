@@ -16,6 +16,11 @@ const NavBar = () => {
             </Link>
           </li>
           <li>
+            <Link to="/createpost" className="brand">
+              Add Post
+            </Link>
+          </li>
+          <li>
             <Link to="/signin" className="brand">
               Login
             </Link>
